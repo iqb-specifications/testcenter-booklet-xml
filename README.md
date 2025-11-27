@@ -1,0 +1,1 @@
+Xml Schema for data specification and validation. The specified data is used as configuration of assessements with the [IQB-Testcenter](https://github.com/iqb-berlin/testcenter).
