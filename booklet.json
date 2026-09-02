@@ -10,6 +10,10 @@
   ],
   
   "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "URI zum JSON-Schema für Validierung und Autovervollständigung"
+    },
     "Metadata": {
       "title": "Metadata",
       "description": "Pflichtangaben zur Identifikation des Booklets.",
