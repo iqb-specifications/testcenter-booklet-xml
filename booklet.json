@@ -8,12 +8,8 @@
     "Metadata",
     "Units"
   ],
-  "additionalProperties": false,
+  
   "properties": {
-    "$schema": {
-      "type": "string",
-      "description": "Verweis auf das JSON-Schema zur Validierung und Autovervollständigung."
-    },
     "Metadata": {
       "title": "Metadata",
       "description": "Pflichtangaben zur Identifikation des Booklets.",
