@@ -8,4 +8,4 @@ https://w3id.org/iqb/spec/testcenter-booklet-xml/17.4
 ```
 #### Experimental documentation
 
-[Documentation](https://iqb-specifications.github.io/testcenter-booklet-xml) is generated from a Booklet-JSON file. This documents all elements, attributes, and values ​​available in the test taker.
+[Documentation](https://iqb-specifications.github.io/testcenter-booklet-xml) is generated from a Booklet-JSON file. This documents all elements, attributes, and values ​​available in the booklet-xml. Only the booklet-configuration is documented separately.
