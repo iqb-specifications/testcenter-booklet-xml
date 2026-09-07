@@ -2,6 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Booklet 18.0",
   "schema_version": "18.0",
+  "additionalProperties": false,
   "description": "Testheft Konfiguration und Organisation von Units und Testlets. **Hier sind beispielhafte Booklet-XML's zu finden: [Booklet adaptives Testen](https://iqb-berlin.github.io/tba-info/study-run/preparation/adaptive/#Beispielkonfiguration), [Booklet ohne adaptives Testen](https://iqb-berlin.github.io/tba-info/study-run/preparation/test-files/booklet-xml.html#aufbau)**",
   "type": "object",
   "required": [
@@ -33,9 +34,7 @@
       "properties": {
         "Config": {
           "type": "array",
-          "items": {
-            "$ref": "#/$defs/key"
-          }
+          "description": "Die Beschreibung der möglichen key-value-Paare erfolgt separat und kann [**hier**](https://iqb.pages.cms.hu-berlin.de/testcenter/pages/booklet-config.html) eingesehen werden."
         }
       }
     },
@@ -48,9 +47,17 @@
     "States": {
       "type": "array",
       "title": "States",
+      "additionalProperties": false,
       "description": "Definition von adaptiven Variablen (Zuständen) für das Testheft. Ermöglicht die komplexe Steuerung von bedingten Blöcken.",
       "items": {
-        "$ref": "#/$defs/state"
+        "type": "object",
+        "required": ["State"],
+        "additionalProperties": false,
+        "properties": {
+          "State": {
+            "$ref": "#/$defs/State"
+          }
+        }
       }
     },
     "Units": {
@@ -141,7 +148,7 @@
       "properties": {
         "CodeToEnter": { "$ref": "#/$defs/CodeToEnter" },
         "TimeMax": { "$ref": "#/$defs/TimeMax" },
-        "Show": {
+        "show": {
           "type": "array",
           "items": { "$ref": "#/$defs/Show" }
         },
@@ -208,415 +215,7 @@
         "scope": { "type": "string", "enum": ["unit", "testlet"] }
       }
     },
-    "key": {
-      "type": "object",
-      "description": "Konfiguration mit key-value Paaren",
-      "additionalProperties": false,
-      "properties": {
-        "loading_mode": {
-          "type": "string",
-          "title": "Ladeverhalten beim Start",
-          "default": "LAZY",
-          "oneOf": [
-            {
-              "const": "LAZY",
-              "description": "Start des Tests sobald wie möglich. Im Hintergrund werden die weiteren Blöcke (Testlets) geladen. Wenn sich Units außerhalb von Blöcken befinden gilt das ganze Booklet als Block und wird komplett geladen. Es müssen also Testlet-Elemente verwendet werden, damit lazy loading funktioniert."
-            },
-            {
-              "const": "EAGER",
-              "description": "Testheft erst dann starten, wenn alle Inhalte geladen sind"
-            }
-          ]
-        },
-        "logPolicy": {
-          "type": "string",
-          "title": "Erfassen und Speichern von Log-Daten",
-          "default": "rich",
-          "oneOf": [
-            { "const": "disabled", "description": "Ausgeschaltet" },
-            { "const": "lean", "description": "Nur wichtige Meldungen" },
-            { "const": "rich", "description": "Alles außer debug-Informationen" },
-            { "const": "debug", "description": "Auch debug-Informationen" }
-          ]
-        },
-        "browserBehaviour": {
-          "type": "string",
-          "title": "Verhalten bei Browser-Navigation",
-          "description": "Mit dieser Einstellung kann das normale Verhalten der Navigation im Browser unterdrückt werden. Dies kann nützlich sein, um versehentliches Navigieren, bspw. über Wischgesten auf Touchscreens, zu vermeiden. Das betrifft alle gängigen Navigationsmechanismen im Browser, also Vor- und Zurück-Knopf und direkte URL-Eingabe.",
-          "default": "standard",
-          "oneOf": [
-            { "const": "standard", "description": "Standardverhalten des Browsers wird verwendet." },
-            { "const": "preventNav", "description": "Navigation des Browsers wird verhindert." }
-          ]
-        },
-        "pagingMode": {
-          "type": "string",
-          "title": "Paging Mode",
-          "description": "pagingMode (https://verona-interfaces.github.io/player/#operation-publish-vopStartCommand)",
-          "default": "separate",
-          "oneOf": [
-            { "const": "separate", "description": "pages are separated" },
-            { "const": "concat-scroll", "description": "concat-scroll" },
-            { "const": "concat-scroll-snap", "description": "concat-scroll-snap" },
-            { "const": "buttons", "description": "buttons for the next page" }
-          ]
-        },
-        "force_presentation_complete": {
-          "type": "string",
-          "title": "Vollständige Anzeige erzwingen",
-          "description": "Legt fest, ob eine eine Aufgabe verlassen werden darf, die noch nicht vollständig angezeigt wurde",
-          "default": "OFF",
-          "oneOf": [
-            { "const": "OFF", "description": "Das Verlassen der unvollständig betrachteten Aufgabe wird nicht verhindert." },
-            { "const": "ALWAYS", "description": "Das Verlassen der unvollständig betrachteten Aufgabe wird verhindert, wenn vorwärts oder rückwärts navigiert werden soll." },
-            { "const": "ON", "description": "Das Verlassen der unvollständig betrachteten Aufgabe wird verhindert, wenn vorwärts navigiert werden soll." }
-          ]
-        },
-        "force_response_complete": {
-          "type": "string",
-          "title": "Vollständige Beantwortung erzwingen",
-          "description": "Legt fest, ob eine eine Aufgabe verlassen werden darf, die noch nicht beantwortet wurde",
-          "default": "OFF",
-          "oneOf": [
-            { "const": "OFF", "description": "Das Verlassen der unvollständig beantworteten Aufgabe wird nicht verhindert." },
-            { "const": "ALWAYS", "description": "Das Verlassen der unvollständig beantworteten Aufgabe wird verhindert, wenn vorwärts oder rückwärts navigiert werden soll." },
-            { "const": "ON", "description": "Das Verlassen der unvollständig beantworteten Aufgabe wird verhindert, wenn vorwärts navigiert werden soll." }
-          ]
-        },
-        "unit_time_left_warnings": {
-          "type": "string",
-          "title": "Zeitwarnungen für Units",
-          "description": "Konfiguriert, bei wie vielen verbleibenden Minuten im zeitbeschränkten Block eine Warnung angezeigt werden soll. Beliebige Werte sind möglich. Der Wert \"10,5,1\" würde zum Beispiel bedeuten, dass bei zehn, fünf und bei einer verbleibenden Minute jeweils eine Warnung angezeigt wird. Wird der Parameter angegeben, aber leer gelassen oder enthält keine Zahlen, so werden keine Warnungen dieser Art angezeigt.",
-          "default": "5,1"
-        },
-        "show_end_button_in_player": {
-          "type": "string",
-          "title": "Test-Beenden-Button im Player",
-          "description": "Manche Player können einen Test-Beenden anzeigen, wenn es es ihnen vom Testcenter erlaubt wird. Diese Einstellung legt fest, wann das der Fall ist.",
-          "default": "OFF",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "OFF", "description": "Den Test-Beenden-Button im Player nie anzeigen." },
-            { "const": "ALWAYS", "description": "Den Test-Beenden-Button im Player immer anzeigen." },
-            { "const": "ONLY_LAST_UNIT", "description": "Den Test-Beenden-Button im Player nur in der letzten Unit anzeigen." }
-          ]
-        },
-        "restore_current_page_on_return": {
-          "type": "string",
-          "title": "Letzte Seite wiederherstellen",
-          "description": "Legt fest, ob, wenn (z. B.) nach einem Neuladen eine Unit wieder geöffnet wird, zur letzten geöffneten Seite gesprungen werden soll.",
-          "default": "OFF",
-          "oneOf": [
-            { "const": "OFF", "description": "Beim Zurückkehren zur Unit auf Seite 1 beginnen." },
-            { "const": "ON", "description": "Beim Zurückkehren zur Unit auf der letzten gesehenen Seite beginnen." }
-          ]
-        },
-        "allow_player_to_terminate_test": {
-          "type": "string",
-          "title": "Player darf Test beenden",
-          "description": "Legt fest, ob der Player des laufenden Test beenden darf, in dem er z. B. einen entsprechenden Navigationsknopf zeigt.",
-          "default": "ON",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "OFF", "description": "Der Player darf den laufenden Test nicht beenden." },
-            { "const": "LAST_UNIT", "description": "Der Player darf den laufenden Test nur Beenden, wenn die letzte Unit erreicht ist." },
-            { "const": "ON", "description": "Der Player darf den laufenden test immer beenden. (`force_presentation_complete` und `force_response_complete` gelten trotzdem!)." }
-          ]
-        },
-        "lock_test_on_termination": {
-          "type": "string",
-          "title": "Test bei Beendigung sperren",
-          "description": "Legt fest, ob der test gesperrt werden soll, wenn er beendet wird. Dies ist mit Vorsicht zu benutzen.",
-          "default": "OFF",
-          "oneOf": [
-            { "const": "ON", "description": "Ja, der Test soll gesperrt werden, wenn er beendet wird. Dies ist mit Vorsicht zu benutzen." },
-            { "const": "OFF", "description": "Nein, der test kann nach dem Beenden wieder aufgerufen werden, so lange der account aktiv ist." }
-          ]
-        },
-        "ask_for_fullscreen": {
-          "type": "string",
-          "title": "Aufforderung zu Vollbild",
-          "description": "Soll beim starten des Booklets eine Aufforderung erscheinen ins Vollbild zu gehen?",
-          "default": "OFF",
-          "oneOf": [
-            { "const": "ON", "description": "Ja." },
-            { "const": "OFF", "description": "Nein." }
-          ]
-        },
-        "unit_responses_buffer_time": {
-          "type": "string",
-          "title": "Speicherfrequenz für Antworten",
-          "description": "Speicherfrequenz für Antworten in Ms.",
-          "default": "5000"
-        },
-        "unit_state_buffer_time": {
-          "type": "string",
-          "title": "Speicherfrequenz für Unit-Zustände",
-          "description": "Speicherfrequenz für Unit-Zustände (zB responseProgress etc.) in Ms.",
-          "default": "6000"
-        },
-        "test_state_buffer_time": {
-          "type": "string",
-          "title": "Speicherfrequenz für Test-Zustände",
-          "description": "Speicherfrequenz für Test-Zustände in Ms.",
-          "default": "1000"
-        },
-        "header_hidden": {
-          "type": "string",
-          "title": "Kopfzeile ausblenden",
-          "description": "Erlaubt das Ausblenden der Kopfzeile. Das Logo und die damit verbundene Navigation zum Verlassen des Tests bleibt sichtbar und überragt den Player-Bereich (Testinhalte).",
-          "default": "FALSE",
-          "oneOf": [
-            { "const": "TRUE", "description": "Kopfzeile wird ausgeblendet." },
-            { "const": "FALSE", "description": "Kopfzeile wird angezeigt." }
-          ]
-        },
-        "header_content": {
-          "type": "string",
-          "title": "Inhalt der Kopfzeile",
-          "description": "Legt fest, was im Kopfbereich als Titel angezeigt wird. Bei via 'header_hidden' versteckten Header, greift diese Einstellung nicht.",
-          "default": "BOOKLET_LABEL",
-          "oneOf": [
-            { "const": "NONE", "description": "Titel auf der Kopfzeile bleibt leer" },
-            { "const": "BOOKLET_LABEL", "description": "Titel des Testhefts/Booklets" },
-            { "const": "BLOCK_LABEL", "description": "Titel des Aufgabenblocks" },
-            { "const": "UNIT_LABEL", "description": "Titel der Unit" }
-          ]
-        },
-        "navbar_unit_label": {
-          "type": "string",
-          "title": "Darstellung der aktiven Unit auf der Navigationsleiste",
-          "description": "Darstellung der aktiven Aufgabe/Unit auf der Navigationsleiste.",
-          "default": "INDEX",
-          "oneOf": [
-            { "const": "HIDDEN", "description": "Anzeige der aktiven Unit wird ausgeblendet (übernimmt ggf. die Aufgabe selbst)" },
-            { "const": "INDEX", "description": "Index der aktuellen Unit und die Gesamtzahl der Units" },
-            { "const": "LABEL", "description": "Der Anzeigename der aktuellen Unit wird angezeigt" }
-          ]
-        },
-        "navbar_unit_controls_hidden": {
-          "type": "string",
-          "title": "Unit-Navigationselemente ausblenden",
-          "description": "Ausblenden der Elemente für die Navigation zwischen Units. Wenn gesetzt, wird nur die Beschriftung angezeigt, aber keine Knöpfe. Einstellung greift nur, wenn das Element nicht ausgeblendet ist.",
-          "default": "FALSE",
-          "oneOf": [
-            { "const": "TRUE", "description": "Navigationselemente sind ausgeblendet" },
-            { "const": "FALSE", "description": "Navigationselemente sind benutzbar" }
-          ]
-        },
-        "navbar_page_label": {
-          "type": "string",
-          "title": "Darstellung der aktiven Seite auf der Navigationsleiste",
-          "description": "Darstellung der aktiven Seite/Teilaufgabe (innerhalb einer Aufgabe)",
-          "default": "INDEX",
-          "oneOf": [
-            { "const": "HIDDEN", "description": "Anzeige der aktiven Seite/Teilaufgabe wird ausgeblendet" },
-            { "const": "INDEX", "description": "Index der aktuellen Seite/Teilaufgabe und die Gesamtzahl der Seiten" },
-            { "const": "LABEL", "description": "Der Anzeigename der aktuellen Seite" },
-            { "const": "LIST", "description": "Seiten werden als horizontale Liste angezeigt" }
-          ]
-        },
-        "navbar_page_controls_hidden": {
-          "type": "string",
-          "title": "Seitennavigationselemente ausblenden",
-          "description": "Ausblenden der Elemente für die Navigation zwischen Seiten/Teilaufgaben. Wenn gesetzt, wird nur die Beschriftung angezeigt, aber keine Knöpfe. Einstellung greift nur, wenn das Element nicht ausgeblendet ist.",
-          "default": "FALSE",
-          "oneOf": [
-            { "const": "TRUE", "description": "Navigationselemente sind ausgeblendet" },
-            { "const": "FALSE", "description": "Navigationselemente sind benutzbar" }
-          ]
-        },
-        "navbar_backward_button": {
-          "type": "string",
-          "title": "Rückwärtsnavigations-Knopf",
-          "description": "Zeigt einen Knopf zur Rückwärtsnavigation auf der Navigationsleiste. Kann konfiguriert werden dynamisch entweder zur vorherigen Seite oder der vorherigen Unit zu navigieren, falls die erste Seite der Unit aktiv ist.",
-          "default": "HIDDEN",
-          "oneOf": [
-            { "const": "HIDDEN", "description": "Navigationselement ist ausgeblendet" },
-            { "const": "DYNAMIC", "description": "Navigationselement navigiert automatisch zur vorherigen Seite oder Unit" },
-            { "const": "UNITS", "description": "Navigationselement navigiert zur vorherigen Unit" },
-            { "const": "PAGES", "description": "Navigationselement navigiert zur vorherigen Seite" }
-          ]
-        },
-        "navbar_forward_button": {
-          "type": "string",
-          "title": "Vorwärtsnavigations-Knopf",
-          "description": "Zeigt einen Knopf zur Vorwärtsnavigation auf der Navigationsleiste. Kann konfiguriert werden dynamisch entweder zur nächsten Seite oder der nächsten Unit zu navigieren, falls die letzte Seite der Unit aktiv ist.",
-          "default": "HIDDEN",
-          "oneOf": [
-            { "const": "HIDDEN", "description": "Navigationselement ist ausgeblendet" },
-            { "const": "DYNAMIC", "description": "Navigationselement navigiert automatisch zur nächsten Seite oder Unit" },
-            { "const": "UNITS", "description": "Navigationselement navigiert zur nächsten Unit" },
-            { "const": "PAGES", "description": "Navigationselement navigiert zur nächsten Seite" }
-          ]
-        },
-        "toolbar_show_unit_title": {
-          "type": "string",
-          "title": "Unit-Titel auf Werkzeugleiste",
-          "description": "Anzeige des Titels der aktiven Unit auf der Werkzeugleiste",
-          "default": "TRUE",
-          "oneOf": [
-            { "const": "TRUE", "description": "Titel der Unit wird angezeigt" },
-            { "const": "FALSE", "description": "Titel wird ausgeblendet" }
-          ]
-        },
-        "toolbar_show_unit_list": {
-          "type": "string",
-          "title": "Unit-Listenansicht auf Werkzeugleiste",
-          "description": "Listenansicht aller Units via Werkzeugleiste",
-          "default": "FALSE",
-          "oneOf": [
-            { "const": "TRUE", "description": "Element zum Einblenden der Liste wird angezeigt." },
-            { "const": "FALSE", "description": "Element zum Einblenden der Liste ist nicht verfügbar." }
-          ]
-        },
-        "toolbar_show_fullscreen_button": {
-          "type": "string",
-          "title": "Vollbild-Knopf auf Werkzeugleiste",
-          "description": "Knopf für Vollbilddarstellung via Werkzeugleiste",
-          "default": "FALSE",
-          "oneOf": [
-            { "const": "TRUE", "description": "Element wird angezeigt." },
-            { "const": "FALSE", "description": "Element wird ausgeblendet." }
-          ]
-        },
-        "toolbar_show_reload_button": {
-          "type": "string",
-          "title": "Seite-neu-laden-Knopf auf Werkzeugleiste",
-          "description": "Knopf für 'Seite neu laden' via Werkzeugleiste",
-          "default": "FALSE",
-          "oneOf": [
-            { "const": "TRUE", "description": "Element wird angezeigt." },
-            { "const": "FALSE", "description": "Element wird ausgeblendet." }
-          ]
-        },
-        "toolbar_show_time_left": {
-          "type": "string",
-          "title": "Verbleibende Zeit auf Werkzeugleiste",
-          "description": "Anzeige verbleibender Zeit (falls definiert) auf der Werkzeugleiste",
-          "default": "FALSE",
-          "oneOf": [
-            { "const": "TRUE", "description": "Die verbleibende Zeit wird angezeigt." },
-            { "const": "FALSE", "description": "Die verbleibende Zeit wird ausgeblendet." }
-          ]
-        },
-        "silent_mode": {
-          "type": "string",
-          "title": "Unterdrückung von Einblendungen",
-          "description": "Unterdrückung von Einblendungen, wie unerlaubte Navigation und Ablauf Timer.",
-          "default": "FALSE",
-          "oneOf": [
-            { "const": "TRUE", "description": "Einblendungen werden unterdrückt." },
-            { "const": "FALSE", "description": "Normales Anzeigeverhalten" }
-          ]
-        },
-        "page_navibuttons": {
-          "type": "string",
-          "title": "Navigationsbuttons für Seitennavigation",
-          "description": "DEPRECATED: Nutzen Sie stattdessen navbar_page_label. Navigationsbuttons für die Seitennavigation (innerhalb einer Aufgabe)",
-          "default": "INDEX",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "OFF", "description": "Keine Seitennavigation unterstützen (übernimmt ggf. die Aufgabe selbst)" },
-            { "const": "INDEX", "description": "Seitennavigation zeigt nur Pfeile und den aktuellen Index" },
-            { "const": "FULL", "description": "Seitennavigation zeigt horizontale Liste aller Seiten" }
-          ]
-        },
-        "unit_navibuttons": {
-          "type": "string",
-          "title": "Navigationsbuttons für Aufgabennavigation",
-          "description": "DEPRECATED: Nutzen Sie stattdessen navbar_unit_label. Navigationsbuttons für die Navigation zwischen den Aufgaben",
-          "default": "INDEX",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "OFF", "description": "Keine Buttons für Aufgabennavigation anzeigen (übernimmt ggf. die Aufgabe selbst)" },
-            { "const": "INDEX", "description": "Der index der aktuellen Aufgabe und die Gesamtzahl an Aufgaben" },
-            { "const": "LABEL", "description": "Der Anzeigename der aktuellen Aufgabe wird angezeigt" }
-          ]
-        },
-        "unit_menu": {
-          "type": "string",
-          "title": "Unit-Menü-Sidebar",
-          "description": "DEPRECATED: Nutzen Sie stattdessen toolbar_show_unit_list. Der Knopf- für die Unit-Menü-Sidebar soll angezeigt werden",
-          "default": "OFF",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "OFF", "description": "Nein" },
-            { "const": "FULL", "description": "Ja" }
-          ]
-        },
-        "unit_screenheader": {
-          "type": "string",
-          "title": "Seitenkopf",
-          "description": "DEPRECATED: Nutzen Sie stattdessen header_content. Legt fest, ob im obersten Seitenbereich Platz für Logo, Navigations-Buttons u. ä. gelassen wird.",
-          "default": "EMPTY",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "OFF", "description": "Kein Seitenkopf. Achtung: Logo bleibt sichtbar (überlappt)." },
-            { "const": "WITH_UNIT_TITLE", "description": "Seitenkopf wird angezeigt mit Titel der Unit (s. Booklet-XML)" },
-            { "const": "WITH_BOOKLET_TITLE", "description": "Seitenkopf wird angezeigt mit Titel des Booklets (s. Booklet-XML)" },
-            { "const": "WITH_BLOCK_TITLE", "description": "Seitenkopf wird angezeigt mit Titel des Aufgabenblocks (s. Booklet-XML)" },
-            { "const": "EMPTY", "description": "Seitenkopf wird angezeigt (leer)" }
-          ]
-        },
-        "unit_title": {
-          "type": "string",
-          "title": "Unit-Titelzeile",
-          "description": "DEPRECATED: Nutzen Sie stattdessen toolbar_show_unit_title. Festlegung, ob oberhalb des Unitbereiches eine Zeile mit dem Unit-Titel gezeigt werden soll",
-          "default": "ON",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "OFF", "description": "Keine Titelzeile" },
-            { "const": "ON", "description": "Eine Zeile wird eingeblendet mit dem Unit-Titel (s. Booklet-XML)." }
-          ]
-        },
-        "unit_show_time_left": {
-          "type": "string",
-          "title": "Verbleibende Zeit anzeigen",
-          "description": "DEPRECATED: Nutzen Sie stattdessen toolbar_show_time_left. Festlegung, ob im obersten Seitenbereich bei einer festgelegten Maximalzeit für einen Testbereich die verbleibende Zeit angezeigt wird.",
-          "default": "OFF",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "OFF", "description": "Die verbleibende Zeit wird nicht angezeigt." },
-            { "const": "ON", "description": "Die verbleibende Zeit wird angezeigt." }
-          ]
-        },
-        "show_fullscreen_button": {
-          "type": "string",
-          "title": "Vollbild-Knopf in Titelleiste",
-          "description": "DEPRECATED: Nutzen Sie stattdessen toolbar_show_fullscreen_button. Soll ein Knopf für Vollbild in der Titelleiste angezeigt werden?",
-          "default": "OFF",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "ON", "description": "Ja." },
-            { "const": "OFF", "description": "Nein." }
-          ]
-        },
-        "show_reload_button": {
-          "type": "string",
-          "title": "Seite-neu-laden-Knopf in Titelleiste",
-          "description": "DEPRECATED: Nutzen Sie stattdessen toolbar_show_reload_button. Soll ein Knopf für 'Seite neu laden' in der Titelleiste angezeigt werden?",
-          "default": "OFF",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "ON", "description": "Ja." },
-            { "const": "OFF", "description": "Nein." }
-          ]
-        },
-        "ui_mode": {
-          "type": "string",
-          "title": "UI-Modus in Hot-Testmodi",
-          "description": "DEPRECATED: Nutzen Sie stattdessen silent_mode. Sichtbarkeit von UI-Elementen in hot Testmodi (run-hot-restart, run-hot-return, run-trial)",
-          "default": "ALL",
-          "deprecated": true,
-          "oneOf": [
-            { "const": "ALL", "description": "Alle UI-Elemente anzeigen (Standard-Verhalten)" },
-            { "const": "NONE", "description": "Keine Dialog-Fenster, Snackbars oder Logo in hot Modi anzeigen" }
-          ]
-        }
-      }
-    },
-    "state": {
+    "State": {
       "title": "State",
       "type": "object",
       "properties": {
