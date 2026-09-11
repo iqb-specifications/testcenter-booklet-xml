@@ -1,9 +1,9 @@
 asyncapi: 3.0.0
-id: "urn:iqb-specifications:testtaker"
+id: "urn:iqb-specifications:booklet"
 defaultContentType: application/json
 info:
   title: "booklet"
-  description: "Specification for testtaker file."
+  description: "Specification for booklet file."
   license:
     name: CC0 1.0
     url: https://creativecommons.org/publicdomain/zero/1.0/
