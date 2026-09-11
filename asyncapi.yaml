@@ -2,7 +2,7 @@ asyncapi: 3.0.0
 id: "urn:iqb-specifications:testtaker"
 defaultContentType: application/json
 info:
-  title: "testtaker"
+  title: "booklet"
   description: "Specification for testtaker file."
   license:
     name: CC0 1.0
@@ -20,5 +20,5 @@ channels:
           $ref: "#/components/schemas/booklet"
 components:
   schemas:
-    testtaker:
+    booklet:
       $ref: "booklet.json"
