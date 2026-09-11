@@ -148,12 +148,12 @@
       "properties": {
         "CodeToEnter": { "$ref": "#/$defs/CodeToEnter" },
         "TimeMax": { "$ref": "#/$defs/TimeMax" },
-        "show": {
+        "Show": {
           "type": "array",
           "items": { "$ref": "#/$defs/Show" }
         },
-        "denyNavigationOnIncomplete": { "$ref": "#/$defs/DenyNavigationOnIncomplete" },
-        "lockAfterLeaving": { "$ref": "#/$defs/LockAfterLeaving" }
+        "DenyNavigationOnIncomplete": { "$ref": "#/$defs/DenyNavigationOnIncomplete" },
+        "LockAfterLeaving": { "$ref": "#/$defs/LockAfterLeaving" }
       }
     },
     "CodeToEnter": {
