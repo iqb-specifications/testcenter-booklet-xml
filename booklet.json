@@ -100,6 +100,9 @@
         "Restrictions": {
           "$ref": "#/$defs/Restrictions"
         },
+        "Calculator": {
+          "$ref": "#/$defs/Calculator"
+        },
         "Unit": {
           "type": "array",
           "description": "Untergeordnete Units innerhalb dieses Testlets.",
@@ -154,6 +157,28 @@
         },
         "DenyNavigationOnIncomplete": { "$ref": "#/$defs/DenyNavigationOnIncomplete" },
         "LockAfterLeaving": { "$ref": "#/$defs/LockAfterLeaving" }
+      }
+    },
+    "Calculator": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Konfiguration für den Taschenrechner innerhalb eines Testlets.",
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["SIMPLE", "SCIENTIFIC"],
+          "description": "Modus des Taschenrechners (einfach oder wissenschaftlich)."
+        },
+        "journalLines": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Anzahl der Zeilen für den Verlauf (Journal)."
+        },
+        "maxImageWidthPx": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Maximale Bildbreite in Pixeln."
+        }
       }
     },
     "CodeToEnter": {
