@@ -259,6 +259,19 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:complexType name="CalculatorType">
+    <xs:attribute name="mode">
+      <xs:simpleType>
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="SIMPLE" />
+          <xs:enumeration value="SCIENTIFIC" />
+        </xs:restriction>
+      </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="journalLines" type="xs:nonNegativeInteger" />
+    <xs:attribute name="maxImageWidthPx" type="xs:positiveInteger" />
+  </xs:complexType>
+
   <xs:complexType name="FirstRestrictionsType">
     <xs:all>
       <xs:element name="TimeMax" type="TimeMaxRestrictionType" minOccurs="0" />
@@ -269,6 +282,7 @@
   <xs:complexType name="TestletType">
     <xs:sequence>
       <xs:element name="Restrictions" type="TestletRestrictionsType" minOccurs="0" />
+      <xs:element name="Calculator" type="CalculatorType" minOccurs="0" />
       <xs:sequence>
         <xs:choice maxOccurs="unbounded">
           <xs:element name="Unit" type="UnitType" />
@@ -283,6 +297,7 @@
   <xs:complexType name="FirstTestletType">
     <xs:sequence>
       <xs:element name="Restrictions" type="FirstRestrictionsType" minOccurs="0" />
+      <xs:element name="Calculator" type="CalculatorType" minOccurs="0" />
       <xs:sequence>
         <xs:choice maxOccurs="unbounded">
           <xs:element name="Unit" type="UnitType" />
