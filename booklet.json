@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "Booklet 18.0",
-  "schema_version": "18.0",
+  "title": "Booklet 18.1",
+  "schema_version": "18.1",
   "additionalProperties": false,
   "description": "Testheft Konfiguration und Organisation von Units und Testlets. **Hier sind beispielhafte Booklet-XML's zu finden: [Booklet adaptives Testen](https://iqb-berlin.github.io/tba-info/study-run/preparation/adaptive/#Beispielkonfiguration), [Booklet ohne adaptives Testen](https://iqb-berlin.github.io/tba-info/study-run/preparation/test-files/booklet-xml.html#aufbau)**",
   "type": "object",
@@ -60,12 +60,18 @@
         }
       }
     },
+    "Widgets": {
+      "$ref": "#/$defs/Widgets"
+    },
     "Units": {
       "type": "object",
       "description": "Hier werden Units und Testlets definiert. **Zu beachten ist, dass mindestens eines von beiden angelegt sein muss!**",
       "additionalProperties": false,
       "minProperties": 1,
       "properties": {
+        "widgets": {
+          "$ref": "#/$defs/WidgetIds"
+        },
         "Testlet": {
           "type": "array",
           "description": "Liste von Testlets auf oberster Ebene (Mindestens 'unit' oder 'testlet' erforderlich).",
@@ -97,11 +103,11 @@
           "type": "string",
           "description": "Anzeigename des Testlets."
         },
+        "widgets": {
+          "$ref": "#/$defs/WidgetIds"
+        },
         "Restrictions": {
           "$ref": "#/$defs/Restrictions"
-        },
-        "Calculator": {
-          "$ref": "#/$defs/Calculator"
         },
         "Unit": {
           "type": "array",
@@ -142,6 +148,9 @@
           "type": "string",
           "description": "Da im Booklet keine Unit-Id Duplikate zulässig sind, kann manuell ein Alias vergeben werden. Wird ein Booklet in das Testcenter geladen mit Unit-Id Duplikaten, wird automatisch ein Alias vergeben.",
           "default": "alias" 
+        },
+        "widgets": {
+          "$ref": "#/$defs/WidgetIds"
         }
       }
     },
@@ -159,25 +168,57 @@
         "LockAfterLeaving": { "$ref": "#/$defs/LockAfterLeaving" }
       }
     },
-    "Calculator": {
+    "Widgets": {
       "type": "object",
+      "required": ["Widget"],
       "additionalProperties": false,
-      "description": "Konfiguration für den Taschenrechner innerhalb eines Testlets.",
+      "description": "Widgets, die Testpersonen über die Werkzeugleiste öffnen können. Jedes Widget wird hier einmal konfiguriert und über das Attribut `widgets` von Units, Testlet oder Unit in Units angeboten.",
       "properties": {
-        "mode": {
+        "Widget": {
+          "type": "array",
+          "minItems": 1,
+          "description": "Jede Id darf nur einmal vorkommen.",
+          "items": { "$ref": "#/$defs/Widget" }
+        }
+      }
+    },
+    "Widget": {
+      "type": "object",
+      "required": ["id", "model"],
+      "additionalProperties": false,
+      "description": "Ein Verona-Widget, identifiziert über das Modell in seinen Metadaten. Beispiel: `<Widget id=\"calc\" model=\"CALCULATOR\"><Parameter key=\"JOURNAL_LINES\">2</Parameter></Widget>`",
+      "properties": {
+        "id": {
           "type": "string",
-          "enum": ["SIMPLE", "SCIENTIFIC"],
-          "description": "Modus des Taschenrechners (einfach oder wissenschaftlich)."
+          "pattern": "^[A-Za-z_][A-Za-z0-9._-]*$",
+          "description": "Name, unter dem das Widget im Attribut `widgets` angegeben wird, z. B. 'calc'. Ohne Leerzeichen."
         },
-        "journalLines": {
-          "type": "integer",
-          "minimum": 0,
-          "description": "Anzahl der Zeilen für den Verlauf (Journal)."
+        "model": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Modell aus den Metadaten des Widgets, z. B. 'CALCULATOR'."
         },
-        "maxImageWidthPx": {
-          "type": "integer",
-          "minimum": 1,
-          "description": "Maximale Bildbreite in Pixeln."
+        "Parameter": {
+          "type": "array",
+          "description": "Parameter, die unverändert an das Widget übergeben werden. Welche Parameter es gibt, legt das Widget fest. Jeder Schlüssel darf pro Widget nur einmal vorkommen.",
+          "items": { "$ref": "#/$defs/WidgetParameter" }
+        }
+      }
+    },
+    "WidgetIds": {
+      "type": "string",
+      "description": "Ids der Widgets (siehe Widgets), die in den Units dieses Elements angeboten werden, durch Leerzeichen getrennt, z. B. `widgets=\"calc periodic\"`. Wird vererbt: Eine Unit bietet die Widgets des nächsten Elements an, das dieses Attribut setzt – sie selbst, ihr Testlet oder ein umgebendes Testlet. Ein leerer Wert schaltet alle Widgets ab. Höchstens ein Widget pro Modell."
+    },
+    "WidgetParameter": {
+      "type": "object",
+      "required": ["key"],
+      "additionalProperties": false,
+      "description": "Ein Parameter des Widgets. Der Wert steht als Text im Element, z. B. `<Parameter key=\"JOURNAL_LINES\">2</Parameter>`.",
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Name des Parameters, z. B. 'JOURNAL_LINES'."
         }
       }
     },

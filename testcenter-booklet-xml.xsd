@@ -49,6 +49,13 @@
           </xs:unique>
         </xs:element>
 
+        <xs:element name="Widgets" type="WidgetsType" minOccurs="0">
+          <xs:key name="widgetId">
+            <xs:selector xpath="Widget" />
+            <xs:field xpath="@id" />
+          </xs:key>
+        </xs:element>
+
         <xs:element name="Units" type="FirstTestletType">
           <xs:unique name="unitId">
             <xs:selector xpath=".//Unit" />
@@ -259,18 +266,65 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="CalculatorType">
-    <xs:attribute name="mode">
+  <xs:complexType name="WidgetsType">
+    <xs:annotation>
+      <xs:documentation>
+        Widgets the test-taker can open from the toolbar. Each one is configured here once and offered in
+        units through the widgets attribute of Units, Testlet or Unit.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Widget" type="WidgetType" maxOccurs="unbounded">
+        <xs:unique name="uniqueWidgetParameterKey">
+          <xs:selector xpath="Parameter" />
+          <xs:field xpath="@key" />
+        </xs:unique>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="WidgetType">
+    <xs:annotation>
+      <xs:documentation>
+        A Verona widget, identified by the model in its metadata (e.g. CALCULATOR).
+        The parameters are passed to the widget unchanged; their meaning is defined by the widget.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Parameter" type="WidgetParameterType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:NCName" use="required" />
+    <xs:attribute name="model" type="NonEmptyTokenType" use="required" />
+  </xs:complexType>
+
+  <xs:attributeGroup name="WidgetsAttributes">
+    <xs:attribute name="widgets">
+      <xs:annotation>
+        <xs:documentation>
+          Ids of the widgets (see Widgets) offered in the units of this element, separated by spaces. Inherited:
+          a unit offers the widgets of the nearest of itself, its testlet and the enclosing testlets that sets
+          this attribute. An empty value offers none. At most one widget per model.
+        </xs:documentation>
+      </xs:annotation>
       <xs:simpleType>
-        <xs:restriction base="xs:string">
-          <xs:enumeration value="SIMPLE" />
-          <xs:enumeration value="SCIENTIFIC" />
-        </xs:restriction>
+        <xs:list itemType="xs:NCName" />
       </xs:simpleType>
     </xs:attribute>
-    <xs:attribute name="journalLines" type="xs:nonNegativeInteger" />
-    <xs:attribute name="maxImageWidthPx" type="xs:positiveInteger" />
+  </xs:attributeGroup>
+
+  <xs:complexType name="WidgetParameterType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="key" type="NonEmptyTokenType" use="required" />
+      </xs:extension>
+    </xs:simpleContent>
   </xs:complexType>
+
+  <xs:simpleType name="NonEmptyTokenType">
+    <xs:restriction base="xs:token">
+      <xs:minLength value="1" />
+    </xs:restriction>
+  </xs:simpleType>
 
   <xs:complexType name="FirstRestrictionsType">
     <xs:all>
@@ -282,7 +336,6 @@
   <xs:complexType name="TestletType">
     <xs:sequence>
       <xs:element name="Restrictions" type="TestletRestrictionsType" minOccurs="0" />
-      <xs:element name="Calculator" type="CalculatorType" minOccurs="0" />
       <xs:sequence>
         <xs:choice maxOccurs="unbounded">
           <xs:element name="Unit" type="UnitType" />
@@ -292,12 +345,12 @@
     </xs:sequence>
     <xs:attribute name="id" type="xs:string" use="required"/>
     <xs:attribute name="label" type="xs:string" />
+    <xs:attributeGroup ref="WidgetsAttributes" />
   </xs:complexType>
 
   <xs:complexType name="FirstTestletType">
     <xs:sequence>
       <xs:element name="Restrictions" type="FirstRestrictionsType" minOccurs="0" />
-      <xs:element name="Calculator" type="CalculatorType" minOccurs="0" />
       <xs:sequence>
         <xs:choice maxOccurs="unbounded">
           <xs:element name="Unit" type="UnitType" />
@@ -305,6 +358,7 @@
         </xs:choice>
       </xs:sequence>
     </xs:sequence>
+    <xs:attributeGroup ref="WidgetsAttributes" />
   </xs:complexType>
 
   <xs:complexType name="UnitType">
@@ -312,6 +366,7 @@
     <xs:attribute name="label" type="xs:string" use="required"/>
     <xs:attribute name="labelshort" type="xs:string"/>
     <xs:attribute name="alias" type="xs:string" default="alias" />
+    <xs:attributeGroup ref="WidgetsAttributes" />
   </xs:complexType>
 
   <xs:complexType name="ConfigType">
